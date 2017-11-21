@@ -3,7 +3,6 @@ var extend = require('util')._extend;
 var ArgumentError = require('rest-facade').ArgumentError;
 var RestClient = require('rest-facade').Client;
 
-
 /**
  * @class
  * Abstracts the sign-in, sign-up and change-password processes for Database &
@@ -16,7 +15,7 @@ var RestClient = require('rest-facade').Client;
  * @param  {String}              [options.clientId]     Default client ID.
  * @param  {String}              [options.clientSecret] Default client Secret.
  */
-var OAuthAuthenticator = function (options) {
+var OAuthAuthenticator = function(options) {
   if (!options) {
     throw new ArgumentError('Missing authenticator options');
   }
@@ -31,14 +30,13 @@ var OAuthAuthenticator = function (options) {
    * @type {Object}
    */
   var clientOptions = {
-    errorFormatter: { message: 'message', name: 'error' }
+    errorFormatter: { message: 'message', name: 'error' },
   };
 
   this.oauth = new RestClient(options.baseUrl + '/oauth/:type', clientOptions);
   this.clientId = options.clientId;
   this.clientSecret = options.clientSecret;
 };
-
 
 /**
  * Sign in using a username and password.
@@ -78,14 +76,14 @@ var OAuthAuthenticator = function (options) {
  *
  * @return  {Promise|undefined}
  */
-OAuthAuthenticator.prototype.signIn = function (userData, cb) {
+OAuthAuthenticator.prototype.signIn = function(userData, cb) {
   var params = {
-    type: 'ro'
+    type: 'ro',
   };
   var defaultFields = {
     client_id: this.clientId,
     grant_type: 'password',
-    scope: 'openid'
+    scope: 'openid',
   };
   var data = extend(defaultFields, userData);
 
@@ -93,9 +91,10 @@ OAuthAuthenticator.prototype.signIn = function (userData, cb) {
     throw new ArgumentError('Missing user data object');
   }
 
-  if (typeof data.connection !== 'string'
-      || data.connection.split().length === 0)
-  {
+  if (
+    typeof data.connection !== 'string' ||
+    data.connection.split().length === 0
+  ) {
     throw new ArgumentError('connection field is required');
   }
 
@@ -145,14 +144,14 @@ OAuthAuthenticator.prototype.signIn = function (userData, cb) {
  *
  * @return  {Promise|undefined}
  */
-OAuthAuthenticator.prototype.passwordGrant = function (userData, cb) {
+OAuthAuthenticator.prototype.passwordGrant = function(userData, cb) {
   var params = {
-    type: 'token'
+    type: 'token',
   };
   var defaultFields = {
     client_id: this.clientId,
-    client_secret:  this.clientSecret
-    grant_type: 'password'
+    client_secret: this.clientSecret,
+    grant_type: 'password',
   };
   var data = extend(defaultFields, userData);
 
@@ -160,18 +159,15 @@ OAuthAuthenticator.prototype.passwordGrant = function (userData, cb) {
     throw new ArgumentError('Missing user data object');
   }
 
-  if (typeof data.username !== 'string'
-      || data.username.split().length === 0) {
+  if (typeof data.username !== 'string' || data.username.split().length === 0) {
     throw new ArgumentError('username field is required');
   }
 
-  if (typeof data.password !== 'string'
-      || data.password.split().length === 0) {
+  if (typeof data.password !== 'string' || data.password.split().length === 0) {
     throw new ArgumentError('password field is required');
   }
 
-  if (typeof data.realm === 'string'
-      && data.realm.split().length !== 0) {
+  if (typeof data.realm === 'string' && data.realm.split().length !== 0) {
     data.grant_type = 'http://auth0.com/oauth/grant-type/password-realm';
   }
 
@@ -194,22 +190,26 @@ OAuthAuthenticator.prototype.passwordGrant = function (userData, cb) {
  *
  * @return  {Promise|undefined}
  */
-OAuthAuthenticator.prototype.socialSignIn = function (data, cb) {
+OAuthAuthenticator.prototype.socialSignIn = function(data, cb) {
   var params = {
-    type: 'access_token'
+    type: 'access_token',
   };
 
   if (typeof data !== 'object') {
     throw new ArgumentError('Missing user credential objects');
   }
 
-  if (typeof data.access_token !== 'string'
-      || data.access_token.trim().length === 0) {
+  if (
+    typeof data.access_token !== 'string' ||
+    data.access_token.trim().length === 0
+  ) {
     throw new ArgumentError('access_token field is required');
   }
 
-  if (typeof data.connection !== 'string'
-      || data.connection.trim().length === 0) {
+  if (
+    typeof data.connection !== 'string' ||
+    data.connection.trim().length === 0
+  ) {
     throw new ArgumentError('connection field is required');
   }
 
@@ -221,15 +221,14 @@ OAuthAuthenticator.prototype.socialSignIn = function (data, cb) {
 };
 
 OAuthAuthenticator.prototype.clientCredentialsGrant = function(options, cb) {
-
   var params = {
-    type: 'token'
+    type: 'token',
   };
 
   var defaultFields = {
-    grant_type:     "client_credentials",
-    client_id:      this.clientId,
-    client_secret:  this.clientSecret
+    grant_type: 'client_credentials',
+    client_id: this.clientId,
+    client_secret: this.clientSecret,
   };
 
   var data = extend(defaultFields, options);
